@@ -4,9 +4,10 @@ package collector
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type MoonrakerSystemInfoQueryResponse struct {
@@ -17,6 +18,17 @@ type MoonrakerSystemInfoQueryResponse struct {
 				TotalMemory int    `json:"total_memory"`
 				MemoryUnits string `json:"memory_units"`
 			} `json:"cpu_info"`
+		} `json:"system_info"`
+	} `json:"result"`
+}
+
+type MoonrakerDistributionInfoQueryResponse struct {
+	Result struct {
+		SystemInfo struct {
+			Distribution struct {
+				Name string `json:"distribution"`
+				Id   string `json:"id"`
+			} `json:"distribution_info"`
 		} `json:"system_info"`
 	} `json:"result"`
 }
