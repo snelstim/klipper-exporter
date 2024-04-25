@@ -247,7 +247,14 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 			prometheus.GaugeValue,
 			float64(result.Result.SystemInfo.CpuInfo.CpuCount))
+		log.infof("Collecting system_info for %s", c.target)
+		result, _ := c.fetchMoonrakerSystemInfo(c.target, c.apiKey)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_system_distribution_info", "Klipper system distribution info.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.SystemInfo.Distribution.name))
 	}
+
 
 	// Temperature Store
 	// (deprecated since v0.8.0, use `printer_objects` instead)

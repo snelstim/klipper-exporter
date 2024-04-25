@@ -17,6 +17,10 @@ type MoonrakerSystemInfoQueryResponse struct {
 				TotalMemory int    `json:"total_memory"`
 				MemoryUnits string `json:"memory_units"`
 			} `json:"cpu_info"`
+			{distribution struct {
+				name	string `json:"distribution_name"`
+				id	string `json:"distribution_id"`
+			} `json:"distrubution_info"`
 		} `json:"system_info"`
 	} `json:"result"`
 }
