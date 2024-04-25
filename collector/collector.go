@@ -249,6 +249,16 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 	}
 
+	/* 	// Distribution Info
+	   	if slices.Contains(c.modules, "distribution_info") {
+	   		log.Infof("Collecting distribution_info for %s", c.target)
+	   		result, _ := c.fetchMoonrakerDistributionInfo(c.target, c.apiKey)
+	   		ch <- prometheus.MustNewConstMetric(
+	   			prometheus.NewDesc("klipper_system_distribution_info", "Klipper system distribution info.", nil, nil),
+	   			prometheus.GaugeValue,
+	   			result.Result.SystemInfo.Distribution.Name)
+	   	} */
+
 	// Temperature Store
 	// (deprecated since v0.8.0, use `printer_objects` instead)
 	if slices.Contains(c.modules, "temperature") {

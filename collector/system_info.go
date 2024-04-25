@@ -26,7 +26,7 @@ type MoonrakerDistributionInfoQueryResponse struct {
 	Result struct {
 		SystemInfo struct {
 			Distribution struct {
-				Name string `json:"distribution"`
+				Name string `json:"distribution_name"`
 				Id   string `json:"id"`
 			} `json:"distribution_info"`
 		} `json:"system_info"`
@@ -59,6 +59,42 @@ func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 	}
 
 	var response MoonrakerSystemInfoQueryResponse
+
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey string) (*MoonrakerDistributionInfoQueryResponse, error) {
+	var url = "http://" + klipperHost + "/machine/system_info"
+	log.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	var response MoonrakerDistributionInfoQueryResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
