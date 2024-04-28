@@ -30,7 +30,7 @@ type MoonrakerDistributionInfoQueryResponse struct {
 				Id   string `json:"id"`
 			} `json:"distribution_info"`
 		} `json:"system_info"`
-	} `json:"result"`
+	} `json:"result_D"`
 }
 
 func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (*MoonrakerSystemInfoQueryResponse, error) {
@@ -94,13 +94,13 @@ func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey str
 		return nil, err
 	}
 
-	var response MoonrakerDistributionInfoQueryResponse
+	var response_D MoonrakerDistributionInfoQueryResponse
 
-	err = json.Unmarshal(data, &response)
+	err = json.Unmarshal(data, &response_D)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
-	return &response, nil
+	return &response_D, nil
 }

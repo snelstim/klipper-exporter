@@ -1,4 +1,4 @@
-module github.com/scross01/prometheus-klipper-exporter
+module github.com/snelstim/klipper-exporter
 
 go 1.19
 

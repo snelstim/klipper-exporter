@@ -10,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/scross01/prometheus-klipper-exporter/collector"
+	"github.com/snelstim/klipper-exporter/collector"
 )
 
 // Command line configuration options
