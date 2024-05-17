@@ -478,8 +478,6 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		// Create a new descriptor for the print status metric
 		statusLabels := []string{"state"}
 		statusDesc := prometheus.NewDesc("klipper_print_print_status", "The status of the current print", statusLabels, nil)
-
-		// Map the status string to a numerical value
 		statusValue := map[string]float64{
 			"standby":   0,
 			"printing":  1,
@@ -488,13 +486,11 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			"cancelled": 4,
 			"error":     5,
 		}
-
-		// Add the print status metric to the channel
 		ch <- prometheus.MustNewConstMetric(
 			statusDesc,
 			prometheus.GaugeValue,
-			statusValue[result.Result.Status.PrintStats.State], // Map the status string to its numerical value
-			result.Result.Status.PrintStats.State)              // Use the status string as a label value
+			statusValue[result.Result.Status.PrintStats.State],
+			result.Result.Status.PrintStats.State)
 
 		// display_status
 		ch <- prometheus.MustNewConstMetric(

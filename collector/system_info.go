@@ -69,7 +69,7 @@ func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 	return &response, nil
 }
 
-func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey string) (*MoonrakerDistributionInfoQueryResponse, error) {
+/* func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey string) (*MoonrakerDistributionInfoQueryResponse, error) {
 	var url = "http://" + klipperHost + "/machine/system_info"
 	log.Debug("Collecting metrics from " + url)
 
@@ -104,3 +104,4 @@ func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey str
 
 	return &response_D, nil
 }
+*/
