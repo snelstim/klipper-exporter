@@ -540,6 +540,40 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				pinName)
 		}
 	}
+<<<<<<< Updated upstream
+=======
+	// Spoolman data from moonraker
+	if slices.Contains(c.modules, "moonraker_spoolman") {
+		log.Infof("Collecting Moonraker spoolman status for %s", c.target)
+		result, _ := c.fetchMRSpoolmanStatus(c.target, c.apiKey)
+
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_moonraker_spoolman_status", "Klipper - moonraker spoolman connected status", nil, nil),
+			prometheus.GaugeValue,
+			b2f(result.Result.MRSpoolmanConnected))
+
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_spoolman_current_spool", "Klipper current spool", []string{"spool_id"}, nil),
+			prometheus.GaugeValue,
+			1.0,
+			strconv.Itoa(result.Result.SpoolId))
+
+	}
+	// Spoolman
+	if slices.Contains(c.modules, "spoolman") {
+		result, _ := c.fetchSpoolmanHealth(c.target, c.apiKey)
+		statusLabels := []string{"status"}
+		statusDesc := prometheus.NewDesc("Spoolman Health Status", "The status of Spoolman service", statusLabels, nil)
+		statusValue := map[string]float64{
+			"healthy": 1,
+		}
+		ch <- prometheus.MustNewConstMetric(
+			statusDesc,
+			prometheus.GaugeValue,
+			statusValue[result.Result.Status],
+			result.Result.Status)
+	}
+>>>>>>> Stashed changes
 }
 
 // only return metric if current job status is in progress
