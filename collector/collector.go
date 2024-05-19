@@ -477,7 +477,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 
 		// Create a new descriptor for the print status metric
 		statusLabels := []string{"state"}
-		statusDesc := prometheus.NewDesc("klipper_print_print_status", "The status of the current print", statusLabels, nil)
+		statusDesc := prometheus.NewDesc("klipper_print_status", "The status of the current print", statusLabels, nil)
 		statusValue := map[string]float64{
 			"standby":   0,
 			"printing":  1,
