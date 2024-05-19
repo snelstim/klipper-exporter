@@ -1,7 +1,9 @@
 Prometheus Exporter for Klipper
 ===============================
 
-Initial implmentation of a Prometheus exporter for Klipper to capture operational
+Based on https://github.com/scross01/prometheus-klipper-exporter
+
+Initial implementation of a Prometheus exporter for Klipper to capture operational
 metrics. This is a very rough first implementation and subject to potentially
 significant changes.
 
@@ -16,7 +18,7 @@ Usage
 To start the Prometheus Klipper Exporter from the command line
 
 ```sh
-$ prometheus-klipper-exporter
+$ klipper-exporter
 INFO[0000] Beginning to serve on port :9101             
 ```
 
@@ -39,6 +41,7 @@ scrape_configs:
         "directory_info",
         "printer_objects",
         "history",
+        "spoolman",
       ]
     relabel_configs:
       - source_labels: [__address__]
@@ -111,11 +114,11 @@ $ ssh pi@klipper.local
 To run the exporter as a docker container.
 
 ```sh
-$ docker run -d -p 9101:9101 ghcr.io/scross01/prometheus-klipper-exporter:latest
+$ docker run -d -p 9101:9101 ghcr.io/snelstim/klipper-exporter:main
 ```
 
 See the [example/README.md](example/README.md) for a complete example running
-Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
+Prometheus, Grafana, klipper-exporter and spoolman in Docker using docker compose.
 
 Modules
 -------

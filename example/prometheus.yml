@@ -1,12 +1,13 @@
+# prometheus.yml
 scrape_configs:
 
   - job_name: "klipper"
     scrape_interval: 5s
     metrics_path: /probe
     static_configs:
-      - targets: [ 'klipper:7125' ] # the klipper host
+      - targets: [ 'printer_IP:7125' ]
     params:
-      modules: [ 
+      modules: [
         'process_stats',
         'network_stats',
         'system_info',
@@ -14,23 +15,23 @@ scrape_configs:
         'directory_info',
         'printer_objects',
         'history',
+        'spoolman'
       ]
-    # Enable API Key authentication.
-    # Only set one of `credentials` or `credentials_file`
-    # authorization:
-    #   type: APIKEY
-    #   credentials: '<apikey>'
-    #   credentials_file: `/path/to/private/apikey.txt`
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: klipper-exporter:9101 # host where the klipper-exporter is running
+        replacement: klipper-exporter:9101
+
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['printer_IP:9100']
 
   - job_name: "klipper-exporter"
     scrape_interval: 5s
     metrics_path: /metrics
     static_configs:
-      - targets: [ 'klipper-exporter:9101' ] # host where the klipper-exporter is running
+      - targets: [ 'klipper-exporter:9101' ]

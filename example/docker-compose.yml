@@ -1,4 +1,4 @@
-version: '2'
+# docker-compose.yml
 services:
 
   prometheus:
@@ -6,10 +6,10 @@ services:
     container_name: prometheus
     hostname: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/home/pi/klipper-exporter/prometheus.yml
       - prometheus-data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--config.file=/home/pi/klipper-exporter/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
@@ -19,6 +19,8 @@ services:
     ports:
       - 9090:9090
     restart: unless-stopped
+    dns:
+       192.168.1.1 # Or whatever your DNS is
       
   grafana:
     hostname: grafana
@@ -29,20 +31,38 @@ services:
       - grafana-data:/var/lib/grafana
     environment:
       GF_SERVER_ROOT_URL: http://localhost
-      GF_SECURITY_ADMIN_PASSWORD: 'password1234!@#$' # change password
+      GF_SECURITY_ADMIN_PASSWORD: 'password' # change password
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: 'Editor'
       GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_INSTALL_PLUGINS: michaeldmoore-scatter-panel,natel-discrete-panel # Install or uninstall plugins according to your needs
     ports:
       - "3000:3000/tcp"
 
   klipper-exporter:
     hostname: klipper-exporter
-    image: ghcr.io/scross01/prometheus-klipper-exporter:latest
+    image: ghcr.io/snelstim/klipper-exporter:main
     container_name: klipper-exporter
     restart: unless-stopped
     expose:
       - 9101
+    dns:
+       192.168.1.1 # Or whatever your DNS is
+
+  spoolman:
+    image: ghcr.io/donkie/spoolman:latest
+    restart: unless-stopped
+    volumes:
+      # Mount the host machine's ./data directory into the container's /home/app/.local/share/s>
+      - type: bind
+        source: /home/pi/klipper-spoolman/data # This is where the data will be stored locally.>
+        target: /home/app/.local/share/spoolman # Do NOT change this line
+    ports:
+      # Map the host machine's port 7912 to the container's port 8000
+      - "7912:8000"
+    environment:
+      - TZ=Pacific/Auckland # Optional, defaults to UTC
+
 
 volumes:
   prometheus-data:
