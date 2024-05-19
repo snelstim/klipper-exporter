@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -32,6 +33,13 @@ var prometheusMetricNameInvalidCharactersRegex = regexp.MustCompile(`[^a-zA-Z0-9
 func getValidLabelName(str string) string {
 	// convert hyphens to underscores and strip out all other invalid characters
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
+}
+
+func b2f(cond bool) float64 {
+	if cond {
+		return 1.0
+	}
+	return 0.0
 }
 
 // Collect implements Prometheus.Collector.
@@ -247,14 +255,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 			prometheus.GaugeValue,
 			float64(result.Result.SystemInfo.CpuInfo.CpuCount))
-		log.infof("Collecting system_info for %s", c.target)
-		result, _ := c.fetchMoonrakerSystemInfo(c.target, c.apiKey)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_distribution_info", "Klipper system distribution info.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.SystemInfo.Distribution.name))
 	}
-
 
 	// Temperature Store
 	// (deprecated since v0.8.0, use `printer_objects` instead)
@@ -474,6 +475,23 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.CounterValue,
 			result.Result.Status.PrintStats.FilamentUsed)
 
+		// Create a new descriptor for the print status metric
+		statusLabels := []string{"state"}
+		statusDesc := prometheus.NewDesc("klipper_print_status", "The status of the current print", statusLabels, nil)
+		statusValue := map[string]float64{
+			"standby":   0,
+			"printing":  1,
+			"paused":    2,
+			"complete":  3,
+			"cancelled": 4,
+			"error":     5,
+		}
+		ch <- prometheus.MustNewConstMetric(
+			statusDesc,
+			prometheus.GaugeValue,
+			statusValue[result.Result.Status.PrintStats.State],
+			result.Result.Status.PrintStats.State)
+
 		// display_status
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_print_gcode_progress", "The percentage of print progress, as reported by M73.", nil, nil),
@@ -540,8 +558,6 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				pinName)
 		}
 	}
-<<<<<<< Updated upstream
-=======
 	// Spoolman data from moonraker
 	if slices.Contains(c.modules, "moonraker_spoolman") {
 		log.Infof("Collecting Moonraker spoolman status for %s", c.target)
@@ -573,7 +589,6 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			statusValue[result.Result.Status],
 			result.Result.Status)
 	}
->>>>>>> Stashed changes
 }
 
 // only return metric if current job status is in progress

@@ -4,9 +4,10 @@ package collector
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type MoonrakerSystemInfoQueryResponse struct {
@@ -17,12 +18,19 @@ type MoonrakerSystemInfoQueryResponse struct {
 				TotalMemory int    `json:"total_memory"`
 				MemoryUnits string `json:"memory_units"`
 			} `json:"cpu_info"`
-			{distribution struct {
-				name	string `json:"distribution_name"`
-				id	string `json:"distribution_id"`
-			} `json:"distrubution_info"`
 		} `json:"system_info"`
 	} `json:"result"`
+}
+
+type MoonrakerDistributionInfoQueryResponse struct {
+	Result struct {
+		SystemInfo struct {
+			Distribution struct {
+				Name string `json:"distribution_name"`
+				Id   string `json:"id"`
+			} `json:"distribution_info"`
+		} `json:"system_info"`
+	} `json:"result_D"`
 }
 
 func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (*MoonrakerSystemInfoQueryResponse, error) {
@@ -60,3 +68,40 @@ func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 
 	return &response, nil
 }
+
+/* func (c Collector) fetchMoonrakerDistributionInfo(klipperHost string, apiKey string) (*MoonrakerDistributionInfoQueryResponse, error) {
+	var url = "http://" + klipperHost + "/machine/system_info"
+	log.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	var response_D MoonrakerDistributionInfoQueryResponse
+
+	err = json.Unmarshal(data, &response_D)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return &response_D, nil
+}
+*/

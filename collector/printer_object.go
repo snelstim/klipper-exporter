@@ -4,10 +4,11 @@ package collector
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -114,6 +115,7 @@ type PrinterObjectVirtualSdCard struct {
 	Progress     float64 `json:"progress"`
 	IsActive     bool    `json:"is_active"`
 	FilePosition float64 `json:"file_position"`
+	State        string  `json:"state"`
 }
 
 const virtualSdCardQuery = "virtual_sdcard"
@@ -122,9 +124,10 @@ type PrinterObjectPrintStats struct {
 	TotalDuration float64 `json:"total_duration"`
 	PrintDuration float64 `json:"print_duration"`
 	FilamentUsed  float64 `json:"filament_used"`
+	State         string  `json:"state"`
 }
 
-const printStatsQuery = "print_stats=total_duration,print_duration,filament_used"
+const printStatsQuery = "print_stats=total_duration,print_duration,filament_used,state"
 
 type PrinterObjectDisplayStatus struct {
 	Progress float64 `json:"progress"`
