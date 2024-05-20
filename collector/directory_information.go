@@ -4,12 +4,13 @@ package collector
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
-type MoonrakerDirecotryInfoQueryResponse struct {
+type MoonrakerDirectoryInfoQueryResponse struct {
 	Result struct {
 		DiskUsage struct {
 			Total int64 `json:"total"`
@@ -19,7 +20,7 @@ type MoonrakerDirecotryInfoQueryResponse struct {
 	} `json:"result"`
 }
 
-func (c Collector) fetchMoonrakerDirectoryInfo(klipperHost string, apiKey string) (*MoonrakerDirecotryInfoQueryResponse, error) {
+func (c Collector) fetchMoonrakerDirectoryInfo(klipperHost string, apiKey string) (*MoonrakerDirectoryInfoQueryResponse, error) {
 	var url = "http://" + klipperHost + "/server/files/directory?path=gcodes&extended=false"
 	log.Debug("Collecting metrics from " + url)
 
@@ -44,7 +45,7 @@ func (c Collector) fetchMoonrakerDirectoryInfo(klipperHost string, apiKey string
 		return nil, err
 	}
 
-	var response MoonrakerDirecotryInfoQueryResponse
+	var response MoonrakerDirectoryInfoQueryResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
