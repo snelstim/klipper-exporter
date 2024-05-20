@@ -12,10 +12,11 @@ import (
 )
 
 type Collector struct {
-	ctx     context.Context
-	target  string
-	modules []string
-	apiKey  string
+	ctx            context.Context
+	target         string
+	spoolmanTarget string
+	modules        []string
+	apiKey         string
 }
 
 func New(ctx context.Context, target string, modules []string, apiKey string) *Collector {
@@ -575,9 +576,9 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			strconv.Itoa(result.Result.SpoolId))
 
 	}
-	// Spoolman
-	if slices.Contains(c.modules, "spoolman") {
-		result, _ := c.fetchSpoolmanHealth(c.target, c.apiKey)
+	// Spoolman Health
+	if slices.Contains(c.modules, "spoolman_Health") {
+		result, _ := c.fetchSpoolmanHealth(c.spoolmanTarget, c.apiKey)
 		statusLabels := []string{"status"}
 		statusDesc := prometheus.NewDesc("Spoolman Health Status", "The status of Spoolman service", statusLabels, nil)
 		statusValue := map[string]float64{
@@ -589,6 +590,27 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			statusValue[result.Result.Status],
 			result.Result.Status)
 	}
+
+	if slices.Contains(c.modules, "Spoolman_Spool") {
+		log.Infof("Collecting spoolman spool information for %s", c.spoolmanTarget)
+		result, err := c.fetchSpoolmanFindSpool(c.spoolmanTarget, c.apiKey)
+		if err != nil {
+			log.Errorf("Failed to fetch spoolman spool information: %v", err)
+			return
+		}
+
+		// Loop through the Filament slice and extract SpoolWeight
+		for _, filament := range result.Result.Filament {
+			spoolWeight := filament.SpoolWeight
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("spoolman_spool_info", "Spoolman spool info", []string{"spool_id"}, nil),
+				prometheus.GaugeValue,
+				float64(spoolWeight),
+				strconv.Itoa(filament.Id),
+			)
+		}
+	}
+
 }
 
 // only return metric if current job status is in progress
